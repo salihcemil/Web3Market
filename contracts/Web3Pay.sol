@@ -2,7 +2,6 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
 contract Web3Pay is Ownable {
     string public constant name = "Web3Pay Contract";
@@ -15,22 +14,47 @@ contract Web3Pay is Ownable {
     struct Currency {
         string name;
         address payeeAddress;
+        bool isActive;
     }
     struct Item {
         uint256 itemId;
         string itemName;
-        Currency currency;
+        address currency;
         bool available;
     }
+
+    event ItemAdded(
+        uint256 indexed itemNo,
+        string indexed name,
+        address currency
+    );
+    event ItemDeactivated(uint256 indexed itemNo);
 
     constructor(
         address _currencyERC20Address,
         address _payeeAddress,
         string memory _currencyName
     ) {
-        Currency memory currency = Currency(_currencyName, _payeeAddress);
+        Currency memory currency = Currency(_currencyName, _payeeAddress, true);
         currencies[_currencyERC20Address] = currency;
         itemCounter = 0;
+    }
+
+    function addItem(string memory _itemName, address _currency) external {
+        require(currencies[_currency].isActive, "Currency not found");
+        Item memory item = Item(itemCounter++, _itemName, _currency, true);
+        items[itemCounter++] = item;
+        itemCounter++;
+        emit ItemAdded(itemCounter--, _itemName, _currency);
+    }
+
+    function deactivateItem(uint256 _itemId) external {
+        require(
+            items[_itemId].available,
+            "Item not found or already deactivated"
+        );
+        items[_itemId].available = false;
+        emit ItemDeactivated(_itemId);
     }
 
     function getOwner() public view returns (address) {
