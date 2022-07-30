@@ -29,6 +29,8 @@ contract Web3Pay is Ownable {
         address currency
     );
     event ItemDeactivated(uint256 indexed itemNo);
+    event CurrencyAdded(string currencyName);
+    event CurrencyDisabled(string currencyName);
 
     constructor(
         address _currencyERC20Address,
@@ -40,7 +42,10 @@ contract Web3Pay is Ownable {
         itemCounter = 0;
     }
 
-    function addItem(string memory _itemName, address _currency) external {
+    function addItem(string memory _itemName, address _currency)
+        external
+        onlyOwner
+    {
         require(currencies[_currency].isActive, "Currency not found");
         Item memory item = Item(itemCounter++, _itemName, _currency, true);
         items[itemCounter++] = item;
@@ -48,13 +53,36 @@ contract Web3Pay is Ownable {
         emit ItemAdded(itemCounter--, _itemName, _currency);
     }
 
-    function deactivateItem(uint256 _itemId) external {
+    function deactivateItem(uint256 _itemId) external onlyOwner {
         require(
             items[_itemId].available,
             "Item not found or already deactivated"
         );
         items[_itemId].available = false;
         emit ItemDeactivated(_itemId);
+    }
+
+    function addCurrency(
+        address _ERC20ContractAddress,
+        address _payeeAddress,
+        string memory _currencyName
+    ) external onlyOwner {
+        require(
+            currencies[_ERC20ContractAddress].isActive,
+            "Currency already added"
+        );
+        Currency memory currency = Currency(_currencyName, _payeeAddress, true);
+        currencies[_ERC20ContractAddress] = currency;
+        emit CurrencyAdded(_currencyName);
+    }
+
+    function disableCurrency(address _ERC20ContractAddress) external onlyOwner {
+        require(
+            currencies[_ERC20ContractAddress].isActive,
+            "Currency not active"
+        );
+        currencies[_ERC20ContractAddress].isActive = false;
+        emit CurrencyDisabled(currencies[_ERC20ContractAddress].name);
     }
 
     function getOwner() public view returns (address) {
