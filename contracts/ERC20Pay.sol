@@ -4,8 +4,8 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract Web3Pay is Ownable {
-    string public constant name = "Web3Pay Contract";
+contract ERC20Pay is Ownable {
+    string public constant name = "ERC20Pay";
     uint256 private itemCounter;
 
     mapping(uint256 => Item) items;
@@ -37,7 +37,11 @@ contract Web3Pay is Ownable {
         address indexed currencyAddres,
         address newPayeeAddress
     );
-    event ItemBought(uint256 indexed itemId, address indexed buyer, uint256 amount);
+    event ItemBought(
+        uint256 indexed itemId,
+        address indexed buyer,
+        uint256 amount
+    );
 
     constructor(
         address _currencyERC20Address,
@@ -53,8 +57,11 @@ contract Web3Pay is Ownable {
         string memory _itemName,
         address _currency,
         uint256 _price
-    ) external onlyOwner {
-        require(currencies[IERC20(_currency)].isActive, "Currency not found");
+    ) external onlyOwner returns (uint256) {
+        require(
+            currencies[IERC20(_currency)].isActive == true,
+            "Currency not found"
+        );
         Item memory item = Item(
             itemCounter,
             _itemName,
@@ -63,13 +70,14 @@ contract Web3Pay is Ownable {
             true
         );
         items[itemCounter] = item;
-        itemCounter++;
-        emit ItemAdded(itemCounter--, _itemName, _currency);
+        itemCounter = itemCounter + 1;
+        emit ItemAdded(itemCounter - 1, _itemName, _currency);
+        return itemCounter - 1;
     }
 
     function deactivateItem(uint256 _itemId) external onlyOwner {
         require(
-            items[_itemId].available,
+            items[_itemId].available == true,
             "Item not found or already deactivated"
         );
         items[_itemId].available = false;
@@ -82,7 +90,7 @@ contract Web3Pay is Ownable {
         string memory _currencyName
     ) external onlyOwner {
         require(
-            currencies[IERC20(_ERC20ContractAddress)].isActive,
+            currencies[IERC20(_ERC20ContractAddress)].isActive == false,
             "Currency already added"
         );
         Currency memory currency = Currency(_currencyName, _payeeAddress, true);
@@ -123,6 +131,18 @@ contract Web3Pay is Ownable {
             items[_itemId].price
         );
         emit ItemBought(_itemId, msg.sender, items[_itemId].price);
+    }
+
+    function getCurrency(address _currencyAddress)
+        public
+        view
+        returns (Currency memory)
+    {
+        return currencies[IERC20(_currencyAddress)];
+    }
+
+    function getItem(uint256 _itemId) public view returns (Item memory) {
+        return items[_itemId];
     }
 
     function getOwner() public view returns (address) {
