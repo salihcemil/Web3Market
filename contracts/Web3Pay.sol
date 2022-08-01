@@ -37,6 +37,7 @@ contract Web3Pay is Ownable {
         address indexed currencyAddres,
         address newPayeeAddress
     );
+    event ItemBought(uint256 indexed itemId, address indexed buyer, uint256 amount);
 
     constructor(
         address _currencyERC20Address,
@@ -55,13 +56,13 @@ contract Web3Pay is Ownable {
     ) external onlyOwner {
         require(currencies[IERC20(_currency)].isActive, "Currency not found");
         Item memory item = Item(
-            itemCounter++,
+            itemCounter,
             _itemName,
             IERC20(_currency),
             _price,
             true
         );
-        items[itemCounter++] = item;
+        items[itemCounter] = item;
         itemCounter++;
         emit ItemAdded(itemCounter--, _itemName, _currency);
     }
@@ -121,6 +122,7 @@ contract Web3Pay is Ownable {
             currencies[items[_itemId].currency].payeeAddress,
             items[_itemId].price
         );
+        emit ItemBought(_itemId, msg.sender, items[_itemId].price);
     }
 
     function getOwner() public view returns (address) {
