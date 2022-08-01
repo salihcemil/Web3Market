@@ -41,7 +41,7 @@ describe('ERC20Pay', () => {
         expect(currency.name).to.equal('USDC');
     });
 
-    it('Enables to add new item', async function () {
+    it('Adds new item', async function () {
         const itemId = await sampleContract.addItem("item1", token1.address, 1000);
         var value = BigNumber.from(itemId.value);
         var item = await sampleContract.getItem(value);
@@ -73,7 +73,16 @@ describe('ERC20Pay', () => {
     });
 
     it('buys item', async function () {
-        
+        const itemId = await sampleContract.addItem("item1", token1.address, 1000);
+        var value = BigNumber.from(itemId.value);
+
+        var balance = await token1.connect(acc1).balanceOf(acc1.getAddress());
+        await token1.connect(acc1).approve(sampleContract.address, 1000);
+        //payer: acc1, payee: acc3
+        await expect(await sampleContract.connect(acc1).buyItem(value)).to.emit(sampleContract, "ItemBought").withArgs(value, await acc1.getAddress(), 1000);
+
+        // await expect(contract_V1.settle(1,[user2.address, user3.address], ["1000000000000000000","2000000000000000000"])).to.emit(contract_V1, "Settled")
+        // .withArgs(true);
     });
 
     // it('Should start with initial count', async function () {
