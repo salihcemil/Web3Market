@@ -6,7 +6,7 @@ const main = async () => {
     const[deployer] = await ethers.getSigners();
     console.log(`Address deploying the contract --> ${deployer.address}`);
 
-    const contractFactory = await ethers.getContractFactory("Web3Pay");
+    const contractFactory = await ethers.getContractFactory("ERC20Pay");
     const contract = await contractFactory.deploy();
 
     console.log(`Contract address --> ${contract.address}`);
