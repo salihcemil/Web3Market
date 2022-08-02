@@ -1,6 +1,6 @@
-const { inputToConfig } = require('@ethereum-waffle/compiler');
+//const { inputToConfig } = require('@ethereum-waffle/compiler');
 const { expect } = require('chai');
-const { arrayify } = require('ethers/lib/utils');
+//const { arrayify } = require('ethers/lib/utils');
 const { ethers } = require('hardhat');
 const { BigNumber } = require('ethers');
 
@@ -42,14 +42,14 @@ describe('ERC20Pay', () => {
     });
 
     it('Adds new item', async function () {
-        const itemId = await sampleContract.addItem("item1", token1.address, 1000);
+        const itemId = await sampleContract.addItem("item1", token1.address, 1000, 5);
         var value = BigNumber.from(itemId.value);
         var item = await sampleContract.getItem(value);
         expect(value).to.equal(BigNumber.from(item.itemId));
     });
 
     it('Deactivates item', async function () {
-        const itemId = await sampleContract.addItem("item1", token1.address, 1000);
+        const itemId = await sampleContract.addItem("item1", token1.address, 1000, 5);
         var value = BigNumber.from(itemId.value);
         const result = await sampleContract.deactivateItem(value);
         
@@ -73,18 +73,16 @@ describe('ERC20Pay', () => {
     });
 
     it('buys item', async function () {
-        const itemId = await sampleContract.addItem("item1", token1.address, 1000);
+        const itemId = await sampleContract.addItem("item1", token1.address, 1000, 5);
         var value = BigNumber.from(itemId.value);
 
-        await token1.connect(acc1).approve(sampleContract.address, 1000);
+        await token1.connect(acc1).approve(sampleContract.address, 2000);
 
         //payer: acc1, payee: acc3
-        await expect(await sampleContract.connect(acc1).buyItem(value)).to.emit(sampleContract, "ItemBought").withArgs(value, await acc1.getAddress(), 1000);
+        await expect(await sampleContract.connect(acc1).buyItem(value, 2)).to.emit(sampleContract, "ItemBought").withArgs(value, await acc1.getAddress(), 1000, 2);
     });
 
+    //buy item and update quantity check
+    //buy all items and deactivate the item check
+
 });
-
-
-for(var i=0; i < arrayify.length; i++){
-    
-}
