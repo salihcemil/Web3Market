@@ -23,6 +23,7 @@ contract ERC20Pay is Ownable {
         IERC20 currency;
         uint256 price;
         bool available;
+        uint256 quantity;
     }
 
     event ItemAdded(
@@ -40,7 +41,8 @@ contract ERC20Pay is Ownable {
     event ItemBought(
         uint256 indexed itemId,
         address indexed buyer,
-        uint256 amount
+        uint256 amount,
+        uint256 quantity
     );
 
     constructor(
@@ -56,7 +58,8 @@ contract ERC20Pay is Ownable {
     function addItem(
         string memory _itemName,
         address _currency,
-        uint256 _price
+        uint256 _price,
+        uint256 _quantity
     ) external onlyOwner returns (uint256) {
         require(
             currencies[IERC20(_currency)].isActive == true,
@@ -67,7 +70,8 @@ contract ERC20Pay is Ownable {
             _itemName,
             IERC20(_currency),
             _price,
-            true
+            true,
+            _quantity
         );
         items[itemCounter] = item;
         itemCounter = itemCounter + 1;
@@ -119,18 +123,42 @@ contract ERC20Pay is Ownable {
         emit PayeeAddressUpdated(_currencyAddress, _newPayeeAddress);
     }
 
-    function buyItem(uint256 _itemId) public {
+    function buyItem(uint256 _itemId, uint256 _desiredQuantity) public {
         require(items[_itemId].available, "Item is not available");
+        require(
+            items[_itemId].quantity >= _desiredQuantity,
+            "Desired quantity is over than stock"
+        );
         IERC20 token = items[_itemId].currency;
         uint256 balance = token.balanceOf(msg.sender);
-        require(items[_itemId].price <= balance, "Buyer has no enough balance");
+        require(
+            items[_itemId].price * _desiredQuantity <= balance,
+            "Buyer has no enough balance"
+        );
+        require(
+            items[_itemId].price * _desiredQuantity <=
+                token.allowance(msg.sender, address(this)),
+            "Please check allowance amount"
+        );
 
         token.transferFrom(
             msg.sender,
             currencies[items[_itemId].currency].payeeAddress,
             items[_itemId].price
         );
-        emit ItemBought(_itemId, msg.sender, items[_itemId].price);
+
+        items[_itemId].quantity = items[_itemId].quantity - _desiredQuantity;
+
+        if (items[_itemId].quantity == 0) {
+            this.deactivateItem(_itemId);
+        }
+
+        emit ItemBought(
+            _itemId,
+            msg.sender,
+            items[_itemId].price,
+            _desiredQuantity
+        );
     }
 
     function getCurrency(address _currencyAddress)

@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/salihcemil/Desktop/projects/Web3Pay/contracts/ERC20Pay.sol": {
-      "lastModificationDate": 1659358086508,
-      "contentHash": "d65abb7212a59b84a9a004aa137a3440",
+      "lastModificationDate": 1659430437730,
+      "contentHash": "d2a5db8ae33b07dc774c11feab97f0d0",
       "sourceName": "contracts/ERC20Pay.sol",
       "solcConfig": {
         "version": "0.8.4",
