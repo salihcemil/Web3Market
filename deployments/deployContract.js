@@ -7,7 +7,7 @@ const main = async () => {
     console.log(`Address deploying the contract --> ${deployer.address}`);
 
     const contractFactory = await ethers.getContractFactory("ERC20Pay");
-    const contract = await contractFactory.deploy();
+    const contract = await contractFactory.deploy("0x07865c6E87B9F70255377e024ace6630C1Eaa37F", "0xf73bEe14bA3D2313609503237E1FCAdcE764a665", "USDC");
 
     console.log(`Contract address --> ${contract.address}`);
 }
