@@ -8,33 +8,33 @@ This is a sample project of a compact web3 payment system.
 
 _Please note that it has not been audited for production environment usage yet_
 
-The project mainly consists of the Web3Market contract, a basic ERC20 token contract for tests, the test scrpts, the deployment scripts and configurations.
+The project mainly consists of the Web3Market contract, a basic ERC20 token contract for tests, the test scripts, and the deployment scripts and configurations.
 
 The main contract was inherited as ownable from OpenZeppelin. So there is only one specified role and it's the **Owner**.
 
-The Owner is responsible to add **Items** and **Currencies**, maintain the available stocks, items and currences' availability.
+The Owner is responsible to add **Items** and **Currencies** and maintaining the available stocks, items and currencies availability.
 
 ![System Overview][system-overview]
 
-Currency is a struct that keeps related ERC20 contract address which lets users to buy items with specific ERC20 tokens.
+Currency is a struct that keeps related ERC20 contract addresses which lets users buy items with specific ERC20 tokens.
 
-The main focus on thi project is **StableCoins** such as USDT and USDC.
+The main focus of this project is **StableCoins** such as USDT and USDC.
 
-Each item is listed in a specific currency with IERC interface. It's possible to add new ERC20 tokens and disable the current ones.
+Each item is listed in a specific currency with the IERC interface. It's possible to add new ERC20 tokens and disable the current ones.
 
-Once the contract was deployed, the deployer will be the Owner. Owner can add currency and items. Please note that an initial ERC20 token contract address must be specified at the deployment.
+Once the contract was deployed, the deployer will be the Owner. The owner can add currency and items. Please note that an initial ERC20 token contract address must be specified at the deployment.
 
 Regular users can call buyItem function with an itemId and quantity.
 
 ![Diagram][diagram]
 
-**Please note that, before buying the user should approve to the contract spents his/her tokens**
+**Please note that before buying the user should approve the contract spent on his/her tokens**
 
-The UI component needs to call ERC20 token contract's approve function with the related amount before buying the item. This process cannot done on the contract's end.
+The UI component needs to call the ERC20 token contract's approve function with the related amount before buying the item. This process cannot be done on the contract's end.
 
 ![Payment][payment]
 
-This project focuses only the ethereum smart contract. In production, an offchain system can maintain the rest with an outer database. The offchain system can subscribe and listen the contract events and manage the rest.
+This project focuses only on the Ethereum smart contract. In production, an off-chain system can maintain the rest with an outer database. The off-chain system can subscribe to and listen to the contract events and manage the rest.
 
 ### Limitations
 
