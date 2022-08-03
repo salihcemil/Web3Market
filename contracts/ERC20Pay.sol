@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract ERC20Pay is Ownable {
-    string public constant name = "ERC20Pay";
+    string public constant name = "Web3Market";
     uint256 private itemCounter;
 
     mapping(uint256 => Item) items;
@@ -44,6 +44,7 @@ contract ERC20Pay is Ownable {
         uint256 amount,
         uint256 quantity
     );
+    event QuantityUpdated(uint256 indexed itemId, uint256 availableQuantity);
 
     constructor(
         address _currencyERC20Address,
@@ -73,6 +74,7 @@ contract ERC20Pay is Ownable {
             true,
             _quantity
         );
+        if (_quantity == 0) item.available = false;
         items[itemCounter] = item;
         itemCounter = itemCounter + 1;
         emit ItemAdded(itemCounter - 1, _itemName, _currency);
@@ -121,6 +123,19 @@ contract ERC20Pay is Ownable {
         );
         currencies[IERC20(_currencyAddress)].payeeAddress = _newPayeeAddress;
         emit PayeeAddressUpdated(_currencyAddress, _newPayeeAddress);
+    }
+
+    function updateItemStock(uint256 _itemId, uint256 _additionQuantity)
+        external
+        onlyOwner
+    {
+        require(_additionQuantity > 0, "Addition quantity cannot be zero");
+        require(
+            items[_itemId].available == true,
+            "Item not found or deactivated"
+        );
+        items[_itemId].quantity += _additionQuantity;
+        emit QuantityUpdated(_itemId, items[_itemId].quantity);
     }
 
     function buyItem(uint256 _itemId, uint256 _desiredQuantity) public {

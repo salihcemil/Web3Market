@@ -12,7 +12,7 @@ describe('ERC20Pay', () => {
     beforeEach(async () => {
         [owner, acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
-        Contract = await ethers.getContractFactory("ERC20Pay");
+        Contract = await ethers.getContractFactory("Web3Market");
         tokenContract = await ethers.getContractFactory("testToken");
 
         const factoryToken1 = tokenContract.connect(acc1);
