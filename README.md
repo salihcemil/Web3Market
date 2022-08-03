@@ -30,7 +30,7 @@ Regular users can call buyItem function with an itemId and quantity.
 
 The UI component needs to call ERC20 token contract's approve function with the related amount before buying the item. This process cannot done on the contract's end.
 
-![System Overview][web3market_diagram]
+![System Overview][system-overview]
 
 This project focuses only the ethereum smart contract. In production, an offchain system can maintain the rest with an outer database. The offchain system can subscribe and listen the contract events and manage the rest.
 
